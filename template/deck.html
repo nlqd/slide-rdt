@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="collab-server" content="{{SERVER_URL}}">
+  <meta name="collab-room" content="{{ROOM_ID}}">
+  <title>Collaborative Deck</title>
+  <style>
+    :root {
+      --bg: #faf8f4;
+      --fg: #2c2c2c;
+      --accent: #8b5e3c;
+      --muted: #6b6b6b;
+      --slide-alt-bg: #2c2c2c;
+      --slide-alt-fg: #faf8f4;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+    }
+    .slide {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(2rem, 5vw, 6rem);
+    }
+    .slide-inner {
+      max-width: 72ch;
+      width: 100%;
+    }
+    .slide.invert {
+      background: var(--slide-alt-bg);
+      color: var(--slide-alt-fg);
+    }
+    .slide.invert .eyebrow { color: #c9a87c; }
+    .slide.invert p, .slide.invert li { color: #a0a0a0; }
+    .eyebrow {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1rem; }
+    h2 { font-size: clamp(1.5rem, 3.5vw, 2.5rem); margin-bottom: 0.75rem; }
+    p, li {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    ul { list-style: none; }
+    ul li::before { content: '\2014\0020'; color: var(--accent); }
+    code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.9em;
+      background: rgba(0,0,0,0.06);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+    }
+    .slide.invert code { background: rgba(255,255,255,0.1); }
+    #slide-counter {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      font-family: 'SF Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div id="slide-counter"></div>
+<!-- SLIDES START -->
+  <section class="slide">
+    <div class="slide-inner">
+      <p class="eyebrow">Collaborative Deck</p>
+      <h1>Your Title Here</h1>
+      <p>Edit this file in any text editor. Open in a browser to sync.</p>
+    </div>
+  </section>
+  <section class="slide invert">
+    <div class="slide-inner">
+      <h2>How It Works</h2>
+      <ul>
+        <li>Edit the raw HTML in your editor of choice</li>
+        <li>Open in a browser to preview and sync changes</li>
+        <li>Click Save to download the merged version</li>
+      </ul>
+    </div>
+  </section>
+  <section class="slide">
+    <div class="slide-inner">
+      <h2>Add Your Slides</h2>
+      <p>Each <code>&lt;section class="slide"&gt;</code> is one slide.
+         Add <code>invert</code> class for dark background.</p>
+    </div>
+  </section>
+<!-- SLIDES END -->
+  <script type="application/yjs-state" data-state=""></script>
+  <script>
+{{SYNC_BUNDLE}}
+  </script>
+</body>
+</html>
