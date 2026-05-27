@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const serverUrl = process.argv[2] || 'ws://localhost:4444'
+const serverUrl = process.argv[2] || ''
 const outputFile = process.argv[3] || resolve(__dirname, '../dist/deck.html')
 
 const result = await esbuild.build({
@@ -29,5 +29,5 @@ const html = template
 writeFileSync(outputFile, html)
 console.log(`Built: ${outputFile}`)
 console.log(`Room: ${roomId}`)
-console.log(`Server: ${serverUrl}`)
+console.log(`Server: ${serverUrl || '(none — WebRTC only)'}`)
 console.log(`Size: ${(Buffer.byteLength(html) / 1024).toFixed(1)} KB`)

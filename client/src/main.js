@@ -1,5 +1,6 @@
 import * as Y from 'yjs'
 import { WebsocketProvider } from 'y-websocket'
+import { WebrtcProvider } from 'y-webrtc'
 import { applyExternalEdit } from './diff-bridge.js'
 import {
   extractSlideContent,
@@ -14,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const serverUrl = document.querySelector('meta[name="collab-server"]')?.content
   const roomId = document.querySelector('meta[name="collab-room"]')?.content
 
-  if (!serverUrl || !roomId) {
-    console.warn('collab-slides: missing server URL or room ID in meta tags')
+  if (!roomId) {
+    console.warn('collab-slides: missing room ID in meta tags')
     initNav()
     return
   }
@@ -35,14 +36,25 @@ document.addEventListener('DOMContentLoaded', () => {
     applyExternalEdit(ytext, currentContent)
   }
 
-  const provider = new WebsocketProvider(serverUrl, roomId, doc)
+  const providers = []
+
+  const webrtc = new WebrtcProvider(roomId, doc, {
+    signaling: ['wss://signaling.yjs.dev'],
+  })
+  providers.push(webrtc)
+
+  if (serverUrl) {
+    const ws = new WebsocketProvider(serverUrl, roomId, doc)
+    providers.push(ws)
+  }
 
   const syncHandle = {
     doc,
     ytext,
-    provider,
+    provider: providers[0],
+    providers,
     getSerializedState: () => serializeState(doc),
-    disconnect: () => provider.disconnect(),
+    disconnect: () => providers.forEach(p => p.disconnect()),
   }
 
   let ui

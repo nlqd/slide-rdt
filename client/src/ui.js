@@ -31,15 +31,22 @@ export function initUI({ syncHandle, originalHtml }) {
   })
   banner.appendChild(saveBtn)
 
-  syncHandle.provider.on('status', ({ status: s }) => {
-    if (s === 'connected') {
-      status.textContent = 'synced'
-      status.style.color = '#4a7c59'
-    } else {
-      status.textContent = 'offline'
-      status.style.color = '#a0522d'
+  for (const provider of syncHandle.providers) {
+    if (provider.on) {
+      provider.on('status', ({ status: s }) => {
+        if (s === 'connected') {
+          status.textContent = 'synced'
+          status.style.color = '#4a7c59'
+        }
+      })
     }
-  })
+    if (provider.once) {
+      provider.once('synced', () => {
+        status.textContent = 'synced'
+        status.style.color = '#4a7c59'
+      })
+    }
+  }
 
   function showRemoteChanges() {
     status.textContent = 'remote changes received'
