@@ -90,4 +90,19 @@ old
     assert.ok(result.includes('data-state="newstate"'))
     assert.ok(result.includes(`<code>type="application/yjs-state"</code>`), 'preserves slide content')
   })
+
+  it('returns null when TYPE_ATTR appears only in a script body after the slides marker', () => {
+    const bundleScript = `<script>const sel = 'script[type="application/yjs-state"]';</script>`
+    const html = `<!-- SLIDES START -->\n<!-- SLIDES END -->\n${bundleScript}`
+    assert.equal(buildSaveableHtml(html, '', 'xyz'), null)
+  })
+
+  it('finds the real state tag when a later script body also contains TYPE_ATTR string', () => {
+    const bundleScript = `<script>const sel = 'script[type="application/yjs-state"]';</script>`
+    const html = `<!-- SLIDES START -->\n<!-- SLIDES END -->\n<script type="application/yjs-state" data-state="old"></script>\n${bundleScript}`
+    const result = buildSaveableHtml(html, '', 'newstate')
+    assert.ok(result !== null)
+    assert.ok(result.includes('data-state="newstate"'))
+    assert.ok(result.includes(bundleScript), 'preserves bundle script')
+  })
 })

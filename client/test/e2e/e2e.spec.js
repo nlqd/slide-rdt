@@ -36,7 +36,9 @@ function waitForSync(page) {
   return page.waitForFunction(
     () => {
       const el = document.getElementById('sync-status')
-      return el && el.textContent === 'synced'
+      if (!el) return false
+      const text = el.textContent
+      return text === 'synced' || text === 'remote changes received'
     },
     { timeout: 10000 }
   )

@@ -16,19 +16,19 @@ export function initUI({ syncHandle, originalHtml }) {
   status.textContent = 'connecting...'
   banner.appendChild(status)
 
-  let errorShownAt = 0
-  const ERROR_HOLD_MS = 5000
+  let importantUntil = 0
+  const HOLD_MS = 5000
 
   function setStatus(text, color) {
-    if (Date.now() - errorShownAt < ERROR_HOLD_MS) return
+    if (Date.now() < importantUntil) return
     status.textContent = text
     status.style.color = color
   }
 
-  function setError(text) {
-    errorShownAt = Date.now()
+  function setImportant(text, color) {
+    importantUntil = Date.now() + HOLD_MS
     status.textContent = text
-    status.style.color = '#a0522d'
+    status.style.color = color
   }
 
   const saveBtn = document.createElement('button')
@@ -41,13 +41,13 @@ export function initUI({ syncHandle, originalHtml }) {
     const html = document.documentElement.outerHTML
     const slideContent = extractSlideContent(html)
     if (slideContent === null) {
-      setError('save failed: slide markers missing')
+      setImportant('save failed: slide markers missing', '#a0522d')
       return
     }
     const state = syncHandle.getSerializedState()
     const result = buildSaveableHtml(originalHtml, slideContent, state)
     if (result === null) {
-      setError('save failed: cannot rebuild HTML')
+      setImportant('save failed: cannot rebuild HTML', '#a0522d')
       return
     }
     triggerDownload(result)
@@ -66,9 +66,7 @@ export function initUI({ syncHandle, originalHtml }) {
   }
 
   function showRemoteChanges() {
-    errorShownAt = 0
-    status.textContent = 'remote changes received'
-    status.style.color = '#8b6914'
+    setImportant('remote changes received', '#8b6914')
   }
 
   return { showRemoteChanges }

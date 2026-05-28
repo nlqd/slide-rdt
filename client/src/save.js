@@ -2,22 +2,44 @@ import { MARKER_END, injectSlideContent } from './sync-client.js'
 
 const TYPE_ATTR = 'type="application/yjs-state"'
 
+// Find the close `>` of an opening tag, properly skipping `>` inside quoted attribute values.
+function findOpenTagClose(html, tagStart) {
+  let inQuote = null
+  for (let i = tagStart + 1; i < html.length; i++) {
+    const c = html[i]
+    if (inQuote) {
+      if (c === inQuote) inQuote = null
+    } else if (c === '"' || c === "'") {
+      inQuote = c
+    } else if (c === '>') {
+      return i
+    } else if (c === '<') {
+      return -1
+    }
+  }
+  return -1
+}
+
 function findYjsStateTag(html) {
-  // Only scan the region after the slides end marker so user slide content
-  // containing the literal type attribute string can't match.
   const searchFrom = html.indexOf(MARKER_END)
   if (searchFrom === -1) return null
-  const typeIdx = html.indexOf(TYPE_ATTR, searchFrom)
-  if (typeIdx === -1) return null
-  const tagStart = html.lastIndexOf('<script', typeIdx)
-  if (tagStart === -1 || tagStart < searchFrom) return null
-  const tagEnd = html.indexOf('>', typeIdx + TYPE_ATTR.length)
-  if (tagEnd === -1) return null
-  const openTag = html.slice(tagStart, tagEnd + 1)
-  if (!openTag.includes(TYPE_ATTR)) return null
-  const closeStart = html.indexOf('</script>', tagEnd + 1)
-  if (closeStart === -1) return null
-  return { tagStart, tagEnd: tagEnd + 1, end: closeStart + '</script>'.length }
+  let scanFrom = searchFrom
+  while (true) {
+    const tagStart = html.indexOf('<script', scanFrom)
+    if (tagStart === -1) return null
+    const tagEnd = findOpenTagClose(html, tagStart)
+    if (tagEnd === -1) {
+      scanFrom = tagStart + 1
+      continue
+    }
+    const openTag = html.slice(tagStart, tagEnd + 1)
+    if (openTag.includes(TYPE_ATTR)) {
+      const closeStart = html.indexOf('</script>', tagEnd + 1)
+      if (closeStart === -1) return null
+      return { tagStart, tagEnd: tagEnd + 1, end: closeStart + '</script>'.length }
+    }
+    scanFrom = tagEnd + 1
+  }
 }
 
 export function buildSaveableHtml(html, slideContent, b64State) {
