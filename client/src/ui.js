@@ -56,6 +56,8 @@ export function initUI({ syncHandle, originalHtml }) {
       anyEverConnected = true
       setStatus('synced', '#4a7c59')
     } else if (anyEverConnected && states.every(s => s === 'disconnected')) {
+      // setImportant intentionally overwrites and extends any live error hold;
+      // disconnect is the more urgent state for the user to see.
       setImportant('disconnected', '#a0522d')
     }
   }
