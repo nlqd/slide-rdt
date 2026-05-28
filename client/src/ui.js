@@ -16,6 +16,21 @@ export function initUI({ syncHandle, originalHtml }) {
   status.textContent = 'connecting...'
   banner.appendChild(status)
 
+  let errorShownAt = 0
+  const ERROR_HOLD_MS = 5000
+
+  function setStatus(text, color) {
+    if (Date.now() - errorShownAt < ERROR_HOLD_MS) return
+    status.textContent = text
+    status.style.color = color
+  }
+
+  function setError(text) {
+    errorShownAt = Date.now()
+    status.textContent = text
+    status.style.color = '#a0522d'
+  }
+
   const saveBtn = document.createElement('button')
   saveBtn.textContent = 'Save'
   saveBtn.style.cssText = `
@@ -26,15 +41,13 @@ export function initUI({ syncHandle, originalHtml }) {
     const html = document.documentElement.outerHTML
     const slideContent = extractSlideContent(html)
     if (slideContent === null) {
-      status.textContent = 'save failed: slide markers missing'
-      status.style.color = '#a0522d'
+      setError('save failed: slide markers missing')
       return
     }
     const state = syncHandle.getSerializedState()
     const result = buildSaveableHtml(originalHtml, slideContent, state)
     if (result === null) {
-      status.textContent = 'save failed: cannot rebuild HTML'
-      status.style.color = '#a0522d'
+      setError('save failed: cannot rebuild HTML')
       return
     }
     triggerDownload(result)
@@ -44,23 +57,16 @@ export function initUI({ syncHandle, originalHtml }) {
   for (const provider of syncHandle.providers) {
     if (provider.on) {
       provider.on('status', ({ status: s }) => {
-        if (s === 'connected') {
-          status.textContent = 'synced'
-          status.style.color = '#4a7c59'
-        }
+        if (s === 'connected') setStatus('synced', '#4a7c59')
       })
     }
     if (provider.once) {
-      provider.once('synced', () => {
-        status.textContent = 'synced'
-        status.style.color = '#4a7c59'
-      })
+      provider.once('synced', () => setStatus('synced', '#4a7c59'))
     }
   }
 
   function showRemoteChanges() {
-    status.textContent = 'remote changes received'
-    status.style.color = '#8b6914'
+    setStatus('remote changes received', '#8b6914')
   }
 
   return { showRemoteChanges }

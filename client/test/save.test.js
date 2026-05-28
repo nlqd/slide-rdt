@@ -60,4 +60,19 @@ old
     assert.ok(result.includes('data-state="active"'), 'preserves slide content data-state')
     assert.ok(result.includes('data-state="xyz"'), 'updates yjs-state data-state')
   })
+
+  it('inserts data-state attribute when it is absent', () => {
+    const html = `<!-- SLIDES START -->\n<!-- SLIDES END -->\n<script type="application/yjs-state"></script>`
+    const result = buildSaveableHtml(html, '', 'newstate')
+    assert.ok(result !== null)
+    assert.ok(result.includes('data-state="newstate"'))
+  })
+
+  it('handles base64 state with + / = characters safely', () => {
+    const html = `<!-- SLIDES START -->\n<!-- SLIDES END -->\n<script type="application/yjs-state" data-state=""></script>`
+    const tricky = 'a+b/c==d'
+    const result = buildSaveableHtml(html, '', tricky)
+    assert.ok(result !== null)
+    assert.ok(result.includes(`data-state="${tricky}"`))
+  })
 })
