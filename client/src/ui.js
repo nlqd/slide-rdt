@@ -42,13 +42,21 @@ export function initUI({ syncHandle, originalHtml }) {
   })
   banner.appendChild(saveBtn)
 
+  // y-websocket emits status as { status: 'connected' | 'disconnected' } and
+  // synced with no payload. y-webrtc emits status as { connected: boolean }
+  // and synced as { synced: boolean }. Handle both shapes.
   for (const provider of syncHandle.providers) {
-    if (provider.on) {
-      provider.on('status', ({ status: s }) => {
-        if (s === 'connected') setStatus('synced', '#4a7c59')
-      })
-      provider.on('synced', () => setStatus('synced', '#4a7c59'))
-    }
+    if (!provider.on) continue
+    provider.on('status', (event) => {
+      const connected = event?.status === 'connected' || event?.connected === true
+      const disconnected = event?.status === 'disconnected' || event?.connected === false
+      if (connected) setStatus('synced', '#4a7c59')
+      else if (disconnected) setStatus('disconnected', '#a0522d')
+    })
+    provider.on('synced', (event) => {
+      const isSynced = event === undefined || event === true || event?.synced === true
+      if (isSynced) setStatus('synced', '#4a7c59')
+    })
   }
 
   function showRemoteChanges() {

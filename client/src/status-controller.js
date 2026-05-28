@@ -1,6 +1,7 @@
 export const HOLD_MS = 5000
 
 export function createStatusController(element, { now = () => Date.now(), holdMs = HOLD_MS } = {}) {
+  if (!element) throw new Error('createStatusController: element is required')
   let importantUntil = 0
 
   return {

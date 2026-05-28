@@ -77,4 +77,19 @@ describe('createStatusController', () => {
     }
     assert.equal(el.textContent, 'msg 4')
   })
+
+  it('releases hold at exactly the importantUntil boundary (strict less-than)', () => {
+    const el = makeElement()
+    let t = 1000
+    const ctrl = createStatusController(el, { now: () => t, holdMs: 5000 })
+    ctrl.setImportant('held', '#f00')
+
+    t = 6000  // exactly importantUntil
+    ctrl.setStatus('after', '#0f0')
+    assert.equal(el.textContent, 'after', 'at boundary, hold has just released')
+  })
+
+  it('throws when element is null', () => {
+    assert.throws(() => createStatusController(null), /element is required/)
+  })
 })
