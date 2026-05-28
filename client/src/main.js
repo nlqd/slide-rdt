@@ -3,6 +3,8 @@ import { WebsocketProvider } from 'y-websocket'
 import { WebrtcProvider } from 'y-webrtc'
 import { applyExternalEdit } from './diff-bridge.js'
 import {
+  MARKER_START,
+  MARKER_END,
   extractSlideContent,
   hydrateDoc,
   serializeState,
@@ -31,6 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
   hydrateDoc(doc, existingState)
 
   const slidesContainer = document.getElementById('slides')
+  if (!slidesContainer) {
+    console.warn('collab-slides: missing #slides container')
+    initNav()
+    return
+  }
+
   const currentContent = extractSlideContent(slidesContainer.innerHTML)
   if (currentContent !== null) {
     applyExternalEdit(ytext, currentContent)
@@ -58,9 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   let ui
-
-  const MARKER_START = '<!-- SLIDES START -->'
-  const MARKER_END = '<!-- SLIDES END -->'
+  let nav = initNav()
 
   ytext.observe(() => {
     const remoteContent = ytext.toString()
@@ -73,11 +79,11 @@ document.addEventListener('DOMContentLoaded', () => {
         containerHtml.slice(0, startIdx + MARKER_START.length) +
         '\n' + remoteContent + '\n' +
         containerHtml.slice(endIdx)
-      initNav()
+      nav.destroy()
+      nav = initNav()
       if (ui) ui.showRemoteChanges()
     }
   })
 
-  initNav()
   ui = initUI({ syncHandle, originalHtml })
 })

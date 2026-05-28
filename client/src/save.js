@@ -1,10 +1,11 @@
 import { injectSlideContent } from './sync-client.js'
 
 export function buildSaveableHtml(html, slideContent, b64State) {
+  if (slideContent === null) return null
   let result = injectSlideContent(html, '\n' + slideContent + '\n')
   result = result.replace(
-    /(data-state=")[^"]*(")/,
-    `$1${b64State}$2`
+    /(type="application\/yjs-state" data-state=")[^"]*(")/,
+    (_, prefix, suffix) => `${prefix}${b64State}${suffix}`
   )
   return result
 }
@@ -16,5 +17,5 @@ export function triggerDownload(html, filename = 'deck.html') {
   a.href = url
   a.download = filename
   a.click()
-  URL.revokeObjectURL(url)
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }

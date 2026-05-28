@@ -27,7 +27,7 @@ export function initNav() {
 
   for (const slide of slides()) observer.observe(slide)
 
-  document.addEventListener('keydown', (e) => {
+  function onKeydown(e) {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
       e.preventDefault()
       goTo(current + 1)
@@ -35,8 +35,16 @@ export function initNav() {
       e.preventDefault()
       goTo(current - 1)
     }
-  })
+  }
 
+  document.addEventListener('keydown', onKeydown)
   updateCounter(0, slides().length)
-  return { goTo }
+
+  return {
+    goTo,
+    destroy: () => {
+      observer.disconnect()
+      document.removeEventListener('keydown', onKeydown)
+    },
+  }
 }

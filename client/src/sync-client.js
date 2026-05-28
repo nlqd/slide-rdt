@@ -1,7 +1,7 @@
 import * as Y from 'yjs'
 
-const MARKER_START = '<!-- SLIDES START -->'
-const MARKER_END = '<!-- SLIDES END -->'
+export const MARKER_START = '<!-- SLIDES START -->'
+export const MARKER_END = '<!-- SLIDES END -->'
 
 export function extractSlideContent(html) {
   const startIdx = html.indexOf(MARKER_START)
@@ -13,6 +13,7 @@ export function extractSlideContent(html) {
 export function injectSlideContent(html, newContent) {
   const startIdx = html.indexOf(MARKER_START)
   const endIdx = html.indexOf(MARKER_END)
+  if (startIdx === -1 || endIdx === -1) return html
   return html.slice(0, startIdx + MARKER_START.length) +
     newContent +
     html.slice(endIdx)
@@ -20,8 +21,11 @@ export function injectSlideContent(html, newContent) {
 
 export function serializeState(doc) {
   const update = Y.encodeStateAsUpdate(doc)
-  const binary = String.fromCharCode(...update)
-  return btoa(binary)
+  const chunks = []
+  for (let i = 0; i < update.length; i += 8192) {
+    chunks.push(String.fromCharCode.apply(null, update.subarray(i, i + 8192)))
+  }
+  return btoa(chunks.join(''))
 }
 
 export function hydrateDoc(doc, b64State) {

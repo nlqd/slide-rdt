@@ -25,8 +25,14 @@ export function initUI({ syncHandle, originalHtml }) {
   saveBtn.addEventListener('click', () => {
     const html = document.documentElement.outerHTML
     const slideContent = extractSlideContent(html)
+    if (slideContent === null) {
+      status.textContent = 'save failed: slide markers missing'
+      status.style.color = '#a0522d'
+      return
+    }
     const state = syncHandle.getSerializedState()
     const result = buildSaveableHtml(originalHtml, slideContent, state)
+    if (result === null) return
     triggerDownload(result)
   })
   banner.appendChild(saveBtn)
