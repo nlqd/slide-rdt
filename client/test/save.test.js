@@ -105,4 +105,12 @@ old
     assert.ok(result.includes('data-state="newstate"'))
     assert.ok(result.includes(bundleScript), 'preserves bundle script')
   })
+
+  it('handles whitespace before > when inserting data-state', () => {
+    const html = `<!-- SLIDES START -->\n<!-- SLIDES END -->\n<script type="application/yjs-state"   ></script>`
+    const result = buildSaveableHtml(html, '', 'newstate')
+    assert.ok(result !== null)
+    assert.ok(result.includes('data-state="newstate"'))
+    assert.ok(!result.match(/\s+data-state="newstate"\s+>/), 'no extra whitespace before >')
+  })
 })

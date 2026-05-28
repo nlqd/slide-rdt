@@ -56,7 +56,7 @@ export function buildSaveableHtml(html, slideContent, b64State) {
   if (dataStateRegex.test(openTag)) {
     newOpenTag = openTag.replace(dataStateRegex, () => `data-state="${b64State}"`)
   } else {
-    newOpenTag = openTag.slice(0, -1) + ` data-state="${b64State}">`
+    newOpenTag = openTag.replace(/\s*\/?>$/, '') + ` data-state="${b64State}">`
   }
   return withSlides.slice(0, tag.tagStart) + newOpenTag + withSlides.slice(tag.tagEnd)
 }

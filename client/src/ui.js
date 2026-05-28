@@ -1,5 +1,6 @@
 import { buildSaveableHtml, triggerDownload } from './save.js'
 import { extractSlideContent } from './sync-client.js'
+import { createStatusController } from './status-controller.js'
 
 export function initUI({ syncHandle, originalHtml }) {
   const banner = document.createElement('div')
@@ -16,20 +17,7 @@ export function initUI({ syncHandle, originalHtml }) {
   status.textContent = 'connecting...'
   banner.appendChild(status)
 
-  let importantUntil = 0
-  const HOLD_MS = 5000
-
-  function setStatus(text, color) {
-    if (Date.now() < importantUntil) return
-    status.textContent = text
-    status.style.color = color
-  }
-
-  function setImportant(text, color) {
-    importantUntil = Date.now() + HOLD_MS
-    status.textContent = text
-    status.style.color = color
-  }
+  const { setStatus, setImportant } = createStatusController(status)
 
   const saveBtn = document.createElement('button')
   saveBtn.textContent = 'Save'
@@ -59,9 +47,7 @@ export function initUI({ syncHandle, originalHtml }) {
       provider.on('status', ({ status: s }) => {
         if (s === 'connected') setStatus('synced', '#4a7c59')
       })
-    }
-    if (provider.once) {
-      provider.once('synced', () => setStatus('synced', '#4a7c59'))
+      provider.on('synced', () => setStatus('synced', '#4a7c59'))
     }
   }
 
