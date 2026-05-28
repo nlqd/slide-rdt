@@ -64,8 +64,9 @@ Everything between `<!-- SLIDES START -->` and `<!-- SLIDES END -->` is your pla
 The sync engine reserves these names; don't reuse them in your slide content:
 
 - IDs: `collab-slides`, `collab-counter`, `collab-banner`, `collab-status`
-- The `<script type="application/yjs-state">` tag and the final `<script>` (sync bundle)
+- The `<script type="application/yjs-state">` tag (and its `data-state` attribute) plus the final `<script>` (sync bundle)
 - Meta tags `collab-server` and `collab-room`
+- The `<!-- SLIDES START -->` and `<!-- SLIDES END -->` marker comments
 
 One caveat for custom JS: `<script>` tags inside slides only execute on initial page load. After a remote sync update, the slide region's innerHTML is re-rendered without re-running scripts (browser security). If you want custom elements or libraries to apply to sync'd content, register them at the document `<head>` level so they persist across updates.
 

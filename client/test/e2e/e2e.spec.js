@@ -51,9 +51,7 @@ test('full cycle: edit file, open in browser, peer syncs, save works', async ({ 
   const peerAPath = resolve(tmpDir, 'deck-peerA.html')
   copyDeck(deckPath, peerAPath)
   editSlides(peerAPath, `  <section class="slide">
-    <div class="slide-inner">
-      <h2>Peer A Added This</h2>
-    </div>
+    <h2>Peer A Added This</h2>
   </section>`)
 
   const peerBPath = resolve(tmpDir, 'deck-peerB.html')
@@ -112,9 +110,7 @@ test('concurrent edits from both peers merge', async ({ browser }) => {
   const peerAPath = resolve(tmpDir, 'concurrent-A.html')
   copyDeck(deckPath, peerAPath)
   editSlides(peerAPath, `  <section class="slide">
-    <div class="slide-inner">
-      <h2>From Peer A</h2>
-    </div>
+    <h2>From Peer A</h2>
   </section>`)
 
   const peerBPath = resolve(tmpDir, 'concurrent-B.html')
@@ -156,9 +152,7 @@ test('saved file preserves CRDT state for future sync', async ({ browser }) => {
   const peerAPath = resolve(tmpDir, 'roundtrip-A.html')
   copyDeck(deckPath, peerAPath)
   editSlides(peerAPath, `  <section class="slide">
-    <div class="slide-inner">
-      <h2>Round Trip Edit</h2>
-    </div>
+    <h2>Round Trip Edit</h2>
   </section>`)
 
   const pageA = await browser.newPage()
@@ -183,9 +177,7 @@ test('saved file preserves CRDT state for future sync', async ({ browser }) => {
   const secondEditPath = resolve(tmpDir, 'roundtrip-second.html')
   copyDeck(savedPath, secondEditPath)
   editSlides(secondEditPath, `  <section class="slide">
-    <div class="slide-inner">
-      <h2>Second Session Edit</h2>
-    </div>
+    <h2>Second Session Edit</h2>
   </section>`)
 
   const pageD = await browser.newPage()

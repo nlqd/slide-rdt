@@ -33,4 +33,13 @@ describe('built deck provider configuration', () => {
     assert.ok(deck.includes('<!-- SLIDES END -->'))
     assert.ok(deck.includes('application/yjs-state'))
   })
+
+  it('uses collab- prefixed IDs (not old generic names)', () => {
+    const deck = readFileSync(resolve(__dirname, '../../dist/deck.html'), 'utf-8')
+    assert.ok(deck.includes('id="collab-slides"'))
+    assert.ok(deck.includes('id="collab-counter"'))
+    assert.ok(!deck.match(/id="slides"/))
+    assert.ok(!deck.match(/id="slide-counter"/))
+    assert.ok(!deck.match(/id="sync-banner"/))
+  })
 })

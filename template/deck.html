@@ -7,131 +7,94 @@
   <meta name="collab-room" content="{{ROOM_ID}}">
   <title>Collaborative Deck</title>
   <style>
-    /* ───── user-facing styling (free to edit) ───── */
+    /* Theme — edit freely */
     :root {
-      --bg: #faf8f4;
-      --fg: #2c2c2c;
-      --accent: #8b5e3c;
-      --muted: #6b6b6b;
-      --slide-alt-bg: #2c2c2c;
-      --slide-alt-fg: #faf8f4;
+      --bg: #faf8f4; --fg: #2c2c2c;
+      --accent: #8b5e3c; --muted: #6b6b6b;
+      --invert-bg: #2c2c2c; --invert-fg: #faf8f4;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html {
-      scroll-snap-type: y mandatory;
-      overflow-y: scroll;
-      scroll-behavior: smooth;
-    }
-    body {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.5;
-    }
+    html { scroll-snap-type: y mandatory; overflow-y: scroll; scroll-behavior: smooth; }
+    body { font-family: Georgia, serif; background: var(--bg); color: var(--fg); line-height: 1.5; }
     .slide {
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: clamp(2rem, 5vw, 6rem);
+      scroll-snap-align: start; scroll-snap-stop: always;
+      min-height: 100vh; padding: clamp(2rem, 5vw, 6rem);
+      display: grid; place-content: center;
+      grid-template-columns: minmax(0, 72ch);
     }
-    .slide-inner {
-      max-width: 72ch;
-      width: 100%;
-    }
-    .slide.invert {
-      background: var(--slide-alt-bg);
-      color: var(--slide-alt-fg);
-    }
+    .slide.invert { background: var(--invert-bg); color: var(--invert-fg); }
     .slide.invert .eyebrow { color: #c9a87c; }
     .slide.invert p, .slide.invert li { color: #a0a0a0; }
     .eyebrow {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--accent);
-      margin-bottom: 1rem;
+      font: clamp(0.7rem, 1.2vw, 0.85rem)/1 'SF Mono', monospace;
+      text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--accent); margin-bottom: 1rem;
     }
     h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1rem; }
     h2 { font-size: clamp(1.5rem, 3.5vw, 2.5rem); margin-bottom: 0.75rem; }
     p, li {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, sans-serif;
       font-size: clamp(1rem, 2vw, 1.25rem);
-      color: var(--muted);
-      margin-bottom: 0.5rem;
+      color: var(--muted); margin-bottom: 0.5rem;
     }
     ul { list-style: none; }
     ul li::before { content: '\2014\0020'; color: var(--accent); }
     code {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 0.9em;
-      background: rgba(0,0,0,0.06);
-      padding: 0.15em 0.4em;
-      border-radius: 3px;
+      font: 0.9em 'SF Mono', monospace;
+      background: rgba(0,0,0,0.06); padding: 0.15em 0.4em; border-radius: 3px;
     }
     .slide.invert code { background: rgba(255,255,255,0.1); }
-
-    /* ───── sync engine UI (collab- prefix, isolated) ───── */
+    /* Sync engine UI — do not style */
     #collab-counter {
       position: fixed; bottom: 20px; left: 20px;
-      font-family: 'SF Mono', monospace; font-size: 0.8rem;
+      font: 0.8rem 'SF Mono', monospace;
       color: var(--muted); z-index: 2147483647;
     }
     #collab-banner {
       all: initial; position: fixed; bottom: 20px; right: 20px;
       z-index: 2147483647; display: flex; gap: 8px; align-items: center;
-      font-family: system-ui, sans-serif; font-size: 14px;
+      font: 14px system-ui, sans-serif;
     }
-    #collab-banner * { font-family: inherit; }
+    #collab-banner * { font: inherit; }
   </style>
 </head>
 <body>
-  <!--
-    Everything between SLIDES START and SLIDES END is your slide content.
-    Add <section class="slide"> elements freely. Use class="slide invert" for dark.
-    You can include custom <style> and <script> tags, web components,
-    CSS animations, etc. Note: <script> tags re-execute only on initial
-    load, not after a remote sync update — register custom elements at
-    the document <head> level if you want them to apply to sync'd content.
+<div id="collab-counter"></div>
 
-    DO NOT EDIT the #collab-counter div, the application/yjs-state script,
-    or the sync bundle script below this comment — they are the sync engine.
-  -->
-  <div id="collab-counter"></div>
+<!-- ═══════════ YOUR SLIDES (edit freely between the markers) ═══════════ -->
 <div id="collab-slides">
 <!-- SLIDES START -->
-  <section class="slide">
-    <div class="slide-inner">
-      <p class="eyebrow">Collaborative Deck</p>
-      <h1>Your Title Here</h1>
-      <p>Edit this file in any text editor. Open in a browser to sync.</p>
-    </div>
-  </section>
-  <section class="slide invert">
-    <div class="slide-inner">
-      <h2>How It Works</h2>
-      <ul>
-        <li>Edit the raw HTML in your editor of choice</li>
-        <li>Open in a browser to preview and sync changes</li>
-        <li>Click Save to download the merged version</li>
-      </ul>
-    </div>
-  </section>
-  <section class="slide">
-    <div class="slide-inner">
-      <h2>Add Your Slides</h2>
-      <p>Each <code>&lt;section class="slide"&gt;</code> is one slide.
-         Add <code>invert</code> class for dark background.</p>
-    </div>
-  </section>
+
+<section class="slide">
+  <p class="eyebrow">Collaborative Deck</p>
+  <h1>Your Title Here</h1>
+  <p>Edit this file in any text editor. Open in a browser to sync.</p>
+</section>
+
+<section class="slide invert">
+  <h2>How It Works</h2>
+  <ul>
+    <li>Edit the raw HTML in your editor of choice</li>
+    <li>Open in a browser to preview and sync changes</li>
+    <li>Click Save to download the merged version</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Add Your Slides</h2>
+  <p>Each <code>&lt;section class="slide"&gt;</code> is one slide.
+     Add <code>invert</code> class for dark background.
+     You can include custom <code>&lt;style&gt;</code>, <code>&lt;script&gt;</code>,
+     and any HTML.</p>
+</section>
+
 <!-- SLIDES END -->
 </div>
-  <script type="application/yjs-state" data-state=""></script>
-  <script>
+
+<!-- ═══════════ SYNC ENGINE — DO NOT EDIT BELOW ═══════════ -->
+<script type="application/yjs-state" data-state=""></script>
+<script>
 {{SYNC_BUNDLE}}
-  </script>
+</script>
 </body>
 </html>

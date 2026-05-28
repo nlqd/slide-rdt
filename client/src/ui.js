@@ -3,19 +3,11 @@ import { extractSlideContent } from './sync-client.js'
 import { createStatusController } from './status-controller.js'
 
 export function initUI({ syncHandle, originalHtml }) {
-  // Reuse the banner element from the template if present (CSS isolated there),
-  // otherwise create one. The id 'collab-banner' is reserved for the sync engine.
-  let banner = document.getElementById('collab-banner')
-  if (!banner) {
-    banner = document.createElement('div')
-    banner.id = 'collab-banner'
-    banner.style.cssText = `
-      position: fixed; bottom: 20px; right: 20px; z-index: 2147483647;
-      display: flex; gap: 8px; align-items: center;
-      font-family: system-ui, sans-serif; font-size: 14px;
-    `
-    document.body.appendChild(banner)
-  }
+  // The banner is owned by the sync engine — created here, styled by the
+  // template's #collab-banner rule. The 'collab-banner' id is reserved.
+  const banner = document.createElement('div')
+  banner.id = 'collab-banner'
+  document.body.appendChild(banner)
 
   const status = document.createElement('span')
   status.id = 'collab-status'
