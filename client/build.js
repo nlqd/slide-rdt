@@ -17,14 +17,19 @@ const result = await esbuild.build({
   write: false,
 })
 
+// Escape HTML-significant sequences so the HTML parser doesn't misinterpret
+// JS string content as HTML comments or tags when embedded in <script>.
 const bundledJs = result.outputFiles[0].text
+  .replaceAll('<!--', '\\x3c!--')
+  .replaceAll('<script', '\\x3cscript')
+  .replaceAll('</script', '\\x3c/script')
 const template = readFileSync(resolve(__dirname, '../template/deck.html'), 'utf-8')
 const roomId = randomUUID()
 
 const html = template
   .replace('{{SERVER_URL}}', serverUrl)
   .replace('{{ROOM_ID}}', roomId)
-  .replace('{{SYNC_BUNDLE}}', bundledJs)
+  .replace('{{SYNC_BUNDLE}}', () => bundledJs)
 
 writeFileSync(outputFile, html)
 console.log(`Built: ${outputFile}`)

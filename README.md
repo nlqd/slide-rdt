@@ -63,9 +63,14 @@ Don't touch the `<script>` blocks at the bottom, that's the sync engine. Everyth
 
 ## Tests
 
-```
-cd client
-node --test --test-force-exit test/*.test.js
-```
+Unit and integration tests (Node.js, no browser):
 
-18 tests covering the diff engine, state serialization, and integration tests that spin up a real server and verify concurrent offline merges between two peers.
+    cd client
+    npm test
+
+End-to-end tests (Playwright, real Chromium):
+
+    cd client
+    npm run test:e2e
+
+The E2E tests spin up a relay server and a static file server, build deck files, open them in headless Chromium, and verify the full collaboration cycle: file edit, browser sync, save, and reopen. Three scenarios: single-peer edit propagation, concurrent merge from two peers, and round-trip through save/edit/reopen.

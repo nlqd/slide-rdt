@@ -4,7 +4,6 @@ import { WebrtcProvider } from 'y-webrtc'
 import { applyExternalEdit } from './diff-bridge.js'
 import {
   extractSlideContent,
-  injectSlideContent,
   hydrateDoc,
   serializeState,
 } from './sync-client.js'
@@ -31,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const existingState = stateElement?.getAttribute('data-state') || null
   hydrateDoc(doc, existingState)
 
-  const currentContent = extractSlideContent(document.body.innerHTML)
+  const slidesContainer = document.getElementById('slides')
+  const currentContent = extractSlideContent(slidesContainer.innerHTML)
   if (currentContent !== null) {
     applyExternalEdit(ytext, currentContent)
   }
@@ -59,12 +59,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let ui
 
+  const MARKER_START = '<!-- SLIDES START -->'
+  const MARKER_END = '<!-- SLIDES END -->'
+
   ytext.observe(() => {
     const remoteContent = ytext.toString()
-    const localContent = extractSlideContent(document.body.innerHTML)
+    const containerHtml = slidesContainer.innerHTML
+    const localContent = extractSlideContent(containerHtml)
     if (localContent !== null && localContent !== remoteContent) {
-      const bodyHtml = document.body.innerHTML
-      document.body.innerHTML = injectSlideContent(bodyHtml, '\n' + remoteContent + '\n')
+      const startIdx = containerHtml.indexOf(MARKER_START)
+      const endIdx = containerHtml.indexOf(MARKER_END)
+      slidesContainer.innerHTML =
+        containerHtml.slice(0, startIdx + MARKER_START.length) +
+        '\n' + remoteContent + '\n' +
+        containerHtml.slice(endIdx)
       initNav()
       if (ui) ui.showRemoteChanges()
     }

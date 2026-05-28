@@ -7,7 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test --test-force-exit test/diff-bridge.test.js test/sync-client.test.js test/save.test.js test/providers.test.js test/integration.test.js test/webrtc.test.js",
+    "test:e2e": "npx playwright test",
+    "test:all": "npm test && npm run test:e2e"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +23,7 @@
     "yjs": "^13.6.30"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "esbuild": "^0.28.0",
     "node-datachannel": "^0.32.3"
   }

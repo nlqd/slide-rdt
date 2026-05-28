@@ -3,7 +3,7 @@ import { injectSlideContent } from './sync-client.js'
 export function buildSaveableHtml(html, slideContent, b64State) {
   let result = injectSlideContent(html, '\n' + slideContent + '\n')
   result = result.replace(
-    /(<script type="application\/yjs-state" data-state=")[^"]*(")/,
+    /(data-state=")[^"]*(")/,
     `$1${b64State}$2`
   )
   return result
