@@ -13,7 +13,7 @@ export function extractSlideContent(html) {
 export function injectSlideContent(html, newContent) {
   const startIdx = html.indexOf(MARKER_START)
   const endIdx = html.indexOf(MARKER_END)
-  if (startIdx === -1 || endIdx === -1) return html
+  if (startIdx === -1 || endIdx === -1) return null
   return html.slice(0, startIdx + MARKER_START.length) +
     newContent +
     html.slice(endIdx)

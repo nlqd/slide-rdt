@@ -2,11 +2,20 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import * as Y from 'yjs'
 import {
+  MARKER_START,
+  MARKER_END,
   extractSlideContent,
   injectSlideContent,
   hydrateDoc,
   serializeState,
 } from '../src/sync-client.js'
+
+describe('marker constants', () => {
+  it('exports the expected marker strings', () => {
+    assert.equal(MARKER_START, '<!-- SLIDES START -->')
+    assert.equal(MARKER_END, '<!-- SLIDES END -->')
+  })
+})
 
 describe('extractSlideContent', () => {
   it('extracts content between markers', () => {
@@ -32,6 +41,14 @@ describe('injectSlideContent', () => {
     assert.ok(!result.includes('old'))
     assert.ok(result.includes('before'))
     assert.ok(result.includes('after'))
+  })
+
+  it('returns null when markers are missing', () => {
+    assert.equal(injectSlideContent('<body>no markers</body>', 'new'), null)
+  })
+
+  it('returns null when only start marker is present', () => {
+    assert.equal(injectSlideContent('<!-- SLIDES START -->only start', 'new'), null)
   })
 })
 

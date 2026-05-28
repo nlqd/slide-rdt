@@ -19,8 +19,12 @@ const result = await esbuild.build({
 
 // Escape HTML-significant sequences so the parser doesn't misinterpret
 // JS string content as tags/comments when embedded in <script>.
+// All four sequences must be escaped: <!-- and <script open the legacy
+// script-comment state, </script closes the script element, <!DOCTYPE
+// is harmless inside <script> but kept for defense-in-depth.
 const bundledJs = result.outputFiles[0].text
   .replaceAll('<!--', '\\x3c!--')
+  .replaceAll('<script', '\\x3cscript')
   .replaceAll('</script', '\\x3c/script')
   .replaceAll('<!DOCTYPE', '\\x3c!DOCTYPE')
 const template = readFileSync(resolve(__dirname, '../template/deck.html'), 'utf-8')

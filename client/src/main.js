@@ -3,9 +3,8 @@ import { WebsocketProvider } from 'y-websocket'
 import { WebrtcProvider } from 'y-webrtc'
 import { applyExternalEdit } from './diff-bridge.js'
 import {
-  MARKER_START,
-  MARKER_END,
   extractSlideContent,
+  injectSlideContent,
   hydrateDoc,
   serializeState,
 } from './sync-client.js'
@@ -73,12 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const containerHtml = slidesContainer.innerHTML
     const localContent = extractSlideContent(containerHtml)
     if (localContent !== null && localContent !== remoteContent) {
-      const startIdx = containerHtml.indexOf(MARKER_START)
-      const endIdx = containerHtml.indexOf(MARKER_END)
-      slidesContainer.innerHTML =
-        containerHtml.slice(0, startIdx + MARKER_START.length) +
-        '\n' + remoteContent + '\n' +
-        containerHtml.slice(endIdx)
+      const updated = injectSlideContent(containerHtml, '\n' + remoteContent + '\n')
+      if (updated === null) return
+      slidesContainer.innerHTML = updated
       nav.destroy()
       nav = initNav()
       if (ui) ui.showRemoteChanges()

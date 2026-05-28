@@ -32,7 +32,11 @@ export function initUI({ syncHandle, originalHtml }) {
     }
     const state = syncHandle.getSerializedState()
     const result = buildSaveableHtml(originalHtml, slideContent, state)
-    if (result === null) return
+    if (result === null) {
+      status.textContent = 'save failed: cannot rebuild HTML'
+      status.style.color = '#a0522d'
+      return
+    }
     triggerDownload(result)
   })
   banner.appendChild(saveBtn)

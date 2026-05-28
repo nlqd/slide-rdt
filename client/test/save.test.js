@@ -29,4 +29,35 @@ old
     assert.ok(result.includes('collab-room'))
     assert.ok(result.includes('/* sync bundle */'))
   })
+
+  it('handles data-state before type attribute order', () => {
+    const html = `<!-- SLIDES START -->\nold\n<!-- SLIDES END -->\n<script data-state="old" type="application/yjs-state"></script>`
+    const result = buildSaveableHtml(html, 'new', 'xyz')
+    assert.ok(result !== null, 'should not be null')
+    assert.ok(result.includes('data-state="xyz"'))
+    assert.ok(!result.includes('data-state="old"'))
+  })
+
+  it('returns null when slideContent is null', () => {
+    const html = `<!-- SLIDES START -->\n<!-- SLIDES END -->\n<script type="application/yjs-state" data-state=""></script>`
+    assert.equal(buildSaveableHtml(html, null, 'xyz'), null)
+  })
+
+  it('returns null when markers are missing', () => {
+    const html = `<script type="application/yjs-state" data-state=""></script>`
+    assert.equal(buildSaveableHtml(html, 'new', 'xyz'), null)
+  })
+
+  it('returns null when yjs-state script tag is missing', () => {
+    const html = `<!-- SLIDES START -->\n<!-- SLIDES END -->\n<script>regular script</script>`
+    assert.equal(buildSaveableHtml(html, 'new', 'xyz'), null)
+  })
+
+  it('replaces only the yjs-state tag, not other data-state attributes', () => {
+    const html = `<!-- SLIDES START -->\n<section data-state="active">slide</section>\n<!-- SLIDES END -->\n<script type="application/yjs-state" data-state="old"></script>`
+    const result = buildSaveableHtml(html, '<section data-state="active">slide</section>', 'xyz')
+    assert.ok(result !== null)
+    assert.ok(result.includes('data-state="active"'), 'preserves slide content data-state')
+    assert.ok(result.includes('data-state="xyz"'), 'updates yjs-state data-state')
+  })
 })
