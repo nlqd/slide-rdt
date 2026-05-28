@@ -6,8 +6,13 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const serverUrl = process.argv[2] || ''
-const outputFile = process.argv[3] || resolve(__dirname, '../dist/deck.html')
+const PLACEHOLDER_ROOM = 'REPLACE-ME-PICK-ANY-UNIQUE-STRING'
+
+const args = process.argv.slice(2)
+const usePlaceholder = args.includes('--placeholder')
+const positional = args.filter(a => !a.startsWith('--'))
+const serverUrl = positional[0] || ''
+const outputFile = positional[1] || resolve(__dirname, '../dist/deck.html')
 
 const result = await esbuild.build({
   entryPoints: [resolve(__dirname, 'src/main.js')],
@@ -19,16 +24,13 @@ const result = await esbuild.build({
 
 // Escape HTML-significant sequences so the parser doesn't misinterpret
 // JS string content as tags/comments when embedded in <script>.
-// All four sequences must be escaped: <!-- and <script open the legacy
-// script-comment state, </script closes the script element, <!DOCTYPE
-// is harmless inside <script> but kept for defense-in-depth.
 const bundledJs = result.outputFiles[0].text
   .replaceAll('<!--', '\\x3c!--')
   .replaceAll('<script', '\\x3cscript')
   .replaceAll('</script', '\\x3c/script')
   .replaceAll('<!DOCTYPE', '\\x3c!DOCTYPE')
 const template = readFileSync(resolve(__dirname, '../template/deck.html'), 'utf-8')
-const roomId = randomUUID()
+const roomId = usePlaceholder ? PLACEHOLDER_ROOM : randomUUID()
 
 const html = template
   .replace('{{SERVER_URL}}', () => serverUrl)
@@ -37,6 +39,6 @@ const html = template
 
 writeFileSync(outputFile, html)
 console.log(`Built: ${outputFile}`)
-console.log(`Room: ${roomId}`)
+console.log(`Room: ${roomId}${usePlaceholder ? ' (placeholder — user must change)' : ''}`)
 console.log(`Server: ${serverUrl || '(none — WebRTC only)'}`)
 console.log(`Size: ${(Buffer.byteLength(html) / 1024).toFixed(1)} KB`)

@@ -11,12 +11,33 @@ import {
 import { initNav } from './nav.js'
 import { initUI } from './ui.js'
 
+const PLACEHOLDER_ROOM = 'REPLACE-ME-PICK-ANY-UNIQUE-STRING'
+
+function showSetupBanner(message) {
+  const overlay = document.createElement('div')
+  overlay.style.cssText = `
+    all: initial; position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); z-index: 2147483647;
+    background: #faf8f4; color: #2c2c2c;
+    border: 2px solid #8b5e3c; padding: 24px 32px;
+    font: 16px/1.5 system-ui, sans-serif; max-width: 480px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15); border-radius: 8px;
+  `
+  overlay.innerHTML = `<strong style="font:inherit;">Setup needed</strong><br><br>${message}`
+  document.body.appendChild(overlay)
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const serverUrl = document.querySelector('meta[name="collab-server"]')?.content
   const roomId = document.querySelector('meta[name="collab-room"]')?.content
 
   if (!roomId) {
-    console.warn('collab-slides: missing room ID in meta tags')
+    showSetupBanner('Set a value for <code>&lt;meta name="collab-room" content="..."&gt;</code> in this file. Any unique string works — a UUID, your project name, anything.')
+    initNav()
+    return
+  }
+  if (roomId === PLACEHOLDER_ROOM) {
+    showSetupBanner('Change the <code>collab-room</code> meta tag from the placeholder to your own unique string before sharing. Any text works — a UUID, your deck name, anything. Until then, the deck will not connect to other peers.')
     initNav()
     return
   }

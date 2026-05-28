@@ -2,6 +2,16 @@
 
 Collaborative HTML slide decks using CRDTs. Edit the raw HTML in any text editor, open in a browser to sync changes with collaborators.
 
+## Quick start
+
+```
+wget https://raw.githubusercontent.com/nlqd/slide-rdt/main/dist/deck.html
+```
+
+Open `deck.html` in your editor. Change the `collab-room` meta tag from the placeholder (`REPLACE-ME-PICK-ANY-UNIQUE-STRING`) to any unique string of your choosing (a UUID, your deck name, anything). Edit the slides between the `SLIDES START` / `SLIDES END` markers. Open the file in a browser. Done.
+
+Until you change the placeholder, the deck shows a "Setup needed" banner and refuses to connect — this is intentional, so two people who both `wget` the file don't accidentally end up in the same room.
+
 ## How it works
 
 The slide deck is a single self-contained HTML file (~200KB). It contains your slides, a bundled CRDT engine (Yjs), and two sync transports: WebRTC (peer-to-peer, zero config) and optionally a WebSocket relay (persistent, works across sessions).
