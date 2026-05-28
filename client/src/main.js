@@ -98,9 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
       slidesContainer.innerHTML = updated
       nav.destroy()
       nav = initNav()
-      if (ui) ui.showRemoteChanges()
+      if (ui) {
+        ui.showRemoteChanges()
+        ui.notifyChange()
+      }
     }
   })
 
   ui = initUI({ syncHandle, originalHtml })
+  // Persist initial state (local diff applied at startup) when a file is linked.
+  ui.notifyChange()
 })

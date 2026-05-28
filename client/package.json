@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node --test --test-force-exit test/diff-bridge.test.js test/sync-client.test.js test/save.test.js test/providers.test.js test/integration.test.js test/webrtc.test.js",
+    "test": "node --test --test-force-exit test/diff-bridge.test.js test/sync-client.test.js test/save.test.js test/status-controller.test.js test/file-sync.test.js test/providers.test.js test/integration.test.js test/webrtc.test.js",
     "test:e2e": "npx playwright test",
     "test:all": "npm test && npm run test:e2e"
   },

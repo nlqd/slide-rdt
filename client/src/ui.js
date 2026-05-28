@@ -1,6 +1,7 @@
 import { buildSaveableHtml, triggerDownload } from './save.js'
 import { extractSlideContent } from './sync-client.js'
 import { createStatusController } from './status-controller.js'
+import { createFileLink, isFileSystemAccessSupported } from './file-sync.js'
 
 export function initUI({ syncHandle, originalHtml }) {
   // The banner is owned by the sync engine — created here, styled by the
@@ -16,21 +17,49 @@ export function initUI({ syncHandle, originalHtml }) {
 
   const { setStatus, setImportant } = createStatusController(status)
 
-  const saveBtn = document.createElement('button')
-  saveBtn.textContent = 'Save'
-  saveBtn.style.cssText = `
+  function currentSaveableHtml() {
+    const html = document.documentElement.outerHTML
+    const slideContent = extractSlideContent(html)
+    if (slideContent === null) return null
+    const state = syncHandle.getSerializedState()
+    return buildSaveableHtml(originalHtml, slideContent, state)
+  }
+
+  const btnStyle = `
     padding: 6px 16px; border: 1px solid #888; border-radius: 4px;
     background: #f5f0e8; cursor: pointer; font-size: 14px;
   `
+
+  // Optional File System Access integration — Chrome/Edge only.
+  // When the user links the tab to their local deck.html, every sync
+  // event writes the merged HTML back to disk automatically.
+  const fileLink = isFileSystemAccessSupported()
+    ? createFileLink({
+        getHtml: currentSaveableHtml,
+        onLink: (name) => {
+          linkBtn.textContent = `linked: ${name}`
+          linkBtn.disabled = true
+          setImportant(`linked to ${name}`, '#4a7c59')
+        },
+        onError: (msg) => setImportant(`link failed: ${msg}`, '#a0522d'),
+      })
+    : null
+
+  let linkBtn
+  if (fileLink) {
+    linkBtn = document.createElement('button')
+    linkBtn.textContent = 'Link to file'
+    linkBtn.title = 'Pick your local deck.html so sync writes back to disk automatically'
+    linkBtn.style.cssText = btnStyle
+    linkBtn.addEventListener('click', () => fileLink.pick())
+    banner.appendChild(linkBtn)
+  }
+
+  const saveBtn = document.createElement('button')
+  saveBtn.textContent = 'Save'
+  saveBtn.style.cssText = btnStyle
   saveBtn.addEventListener('click', () => {
-    const html = document.documentElement.outerHTML
-    const slideContent = extractSlideContent(html)
-    if (slideContent === null) {
-      setImportant('save failed: slide markers missing', '#a0522d')
-      return
-    }
-    const state = syncHandle.getSerializedState()
-    const result = buildSaveableHtml(originalHtml, slideContent, state)
+    const result = currentSaveableHtml()
     if (result === null) {
       setImportant('save failed: cannot rebuild HTML', '#a0522d')
       return
@@ -85,5 +114,9 @@ export function initUI({ syncHandle, originalHtml }) {
     setImportant('remote changes received', '#8b6914')
   }
 
-  return { showRemoteChanges }
+  function notifyChange() {
+    fileLink?.scheduleWrite()
+  }
+
+  return { showRemoteChanges, notifyChange }
 }

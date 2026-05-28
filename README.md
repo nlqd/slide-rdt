@@ -25,6 +25,12 @@ The collaboration flow:
 
 The key constraint: local file edits only sync when you open the file in a browser. The browser is the sync trigger. Between browser opens, you're editing offline and that's fine, the CRDT merges everything when you reconnect.
 
+## Live file sync (Chrome / Edge)
+
+If your browser supports the File System Access API (Chromium-based browsers do; Firefox and Safari don't), a "Link to file" button appears in the corner banner. Click it, pick your local `deck.html`, grant write permission — and from then on, every sync event writes the merged HTML back to the file on disk automatically. No more "Save" clicks. The local file stays in lockstep with what the browser shows.
+
+The permission is per-tab. Closing and reopening the tab requires re-linking. Save is still available as a universal fallback.
+
 ## Sync modes
 
 By default, decks sync via WebRTC using the public signaling server at wss://signaling.yjs.dev. No server setup required. Both peers need to have the file open in a browser at the same time for WebRTC to work.
