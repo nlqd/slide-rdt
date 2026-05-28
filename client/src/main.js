@@ -31,9 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const existingState = stateElement?.getAttribute('data-state') || null
   hydrateDoc(doc, existingState)
 
-  const slidesContainer = document.getElementById('slides')
+  const slidesContainer = document.getElementById('collab-slides')
   if (!slidesContainer) {
-    console.warn('collab-slides: missing #slides container')
+    console.warn('collab-slides: missing #collab-slides container')
     initNav()
     return
   }

@@ -35,7 +35,7 @@ test.afterEach(async () => {
 function waitForSync(page) {
   return page.waitForFunction(
     () => {
-      const el = document.getElementById('sync-status')
+      const el = document.getElementById('collab-status')
       if (!el) return false
       const text = el.textContent
       return text === 'synced' || text === 'remote changes received'
@@ -85,7 +85,7 @@ test('full cycle: edit file, open in browser, peer syncs, save works', async ({ 
         blob.text().then(text => resolve(text))
         return origCreateObjectURL(blob)
       }
-      document.querySelector('#sync-banner button').click()
+      document.querySelector('#collab-banner button').click()
     })
   })
   expect(savedHtml).toContain('Peer A Added This')
@@ -172,7 +172,7 @@ test('saved file preserves CRDT state for future sync', async ({ browser }) => {
         blob.text().then(text => resolve(text))
         return origCreateObjectURL(blob)
       }
-      document.querySelector('#sync-banner button').click()
+      document.querySelector('#collab-banner button').click()
     })
   })
   await pageA.close()

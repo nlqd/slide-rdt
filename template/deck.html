@@ -7,6 +7,7 @@
   <meta name="collab-room" content="{{ROOM_ID}}">
   <title>Collaborative Deck</title>
   <style>
+    /* ───── user-facing styling (free to edit) ───── */
     :root {
       --bg: #faf8f4;
       --fg: #2c2c2c;
@@ -72,20 +73,35 @@
       border-radius: 3px;
     }
     .slide.invert code { background: rgba(255,255,255,0.1); }
-    #slide-counter {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      font-family: 'SF Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--muted);
-      z-index: 9999;
+
+    /* ───── sync engine UI (collab- prefix, isolated) ───── */
+    #collab-counter {
+      position: fixed; bottom: 20px; left: 20px;
+      font-family: 'SF Mono', monospace; font-size: 0.8rem;
+      color: var(--muted); z-index: 2147483647;
     }
+    #collab-banner {
+      all: initial; position: fixed; bottom: 20px; right: 20px;
+      z-index: 2147483647; display: flex; gap: 8px; align-items: center;
+      font-family: system-ui, sans-serif; font-size: 14px;
+    }
+    #collab-banner * { font-family: inherit; }
   </style>
 </head>
 <body>
-  <div id="slide-counter"></div>
-<div id="slides">
+  <!--
+    Everything between SLIDES START and SLIDES END is your slide content.
+    Add <section class="slide"> elements freely. Use class="slide invert" for dark.
+    You can include custom <style> and <script> tags, web components,
+    CSS animations, etc. Note: <script> tags re-execute only on initial
+    load, not after a remote sync update — register custom elements at
+    the document <head> level if you want them to apply to sync'd content.
+
+    DO NOT EDIT the #collab-counter div, the application/yjs-state script,
+    or the sync bundle script below this comment — they are the sync engine.
+  -->
+  <div id="collab-counter"></div>
+<div id="collab-slides">
 <!-- SLIDES START -->
   <section class="slide">
     <div class="slide-inner">

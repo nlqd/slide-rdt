@@ -59,7 +59,15 @@ This produces `dist/deck.html`. The server URL and room ID are in `<meta>` tags 
 
 The template follows the html-effectiveness pattern: full-viewport scroll-snapping slides with serif headings and clean typography. Add slides by adding `<section class="slide">` elements between the markers. Use `class="slide invert"` for dark slides.
 
-Don't touch the `<script>` blocks at the bottom, that's the sync engine. Everything between the slide markers is yours.
+Everything between `<!-- SLIDES START -->` and `<!-- SLIDES END -->` is your playground. You can add custom CSS, animations, web components, and inline scripts.
+
+The sync engine reserves these names; don't reuse them in your slide content:
+
+- IDs: `collab-slides`, `collab-counter`, `collab-banner`, `collab-status`
+- The `<script type="application/yjs-state">` tag and the final `<script>` (sync bundle)
+- Meta tags `collab-server` and `collab-room`
+
+One caveat for custom JS: `<script>` tags inside slides only execute on initial page load. After a remote sync update, the slide region's innerHTML is re-rendered without re-running scripts (browser security). If you want custom elements or libraries to apply to sync'd content, register them at the document `<head>` level so they persist across updates.
 
 ## Tests
 

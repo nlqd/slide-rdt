@@ -11,7 +11,7 @@ export function initNav() {
   }
 
   function updateCounter(idx, total) {
-    const el = document.getElementById('slide-counter')
+    const el = document.getElementById('collab-counter')
     if (el) el.textContent = `${idx + 1} / ${total}`
   }
 
