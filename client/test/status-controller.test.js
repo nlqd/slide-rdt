@@ -105,7 +105,7 @@ describe('createStatusController', () => {
 
     t = 3000
     ctrl.setStatus('synced', '#0f0')
-    assert.equal(el.textContent, 'disconnected', 'hold not extended; original importantUntil still in effect')
+    assert.equal(el.textContent, 'disconnected', 'setStatus blocked by original importantUntil=6000; forceStatus did not extend it')
 
     t = 6500
     ctrl.setStatus('synced', '#0f0')
