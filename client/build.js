@@ -40,5 +40,5 @@ const html = template
 writeFileSync(outputFile, html)
 console.log(`Built: ${outputFile}`)
 console.log(`Room: ${roomId}${usePlaceholder ? ' (placeholder — user must change)' : ''}`)
-console.log(`Server: ${serverUrl || '(none — WebRTC only)'}`)
+console.log(`Server: ${serverUrl || '(none — set collab-server or collab-signaling in the file to enable sync)'}`)
 console.log(`Size: ${(Buffer.byteLength(html) / 1024).toFixed(1)} KB`)

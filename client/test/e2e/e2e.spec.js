@@ -83,7 +83,7 @@ test('full cycle: edit file, open in browser, peer syncs, save works', async ({ 
         blob.text().then(text => resolve(text))
         return origCreateObjectURL(blob)
       }
-      document.querySelector('#collab-banner button').click()
+      document.querySelector('#collab-banner button:last-of-type').click()
     })
   })
   expect(savedHtml).toContain('Peer A Added This')
@@ -166,7 +166,7 @@ test('saved file preserves CRDT state for future sync', async ({ browser }) => {
         blob.text().then(text => resolve(text))
         return origCreateObjectURL(blob)
       }
-      document.querySelector('#collab-banner button').click()
+      document.querySelector('#collab-banner button:last-of-type').click()
     })
   })
   await pageA.close()

@@ -23,9 +23,15 @@ after(() => {
 })
 
 describe('built deck provider configuration', () => {
-  it('includes y-webrtc in the bundle', () => {
-    assert.ok(deck.includes('signaling.yjs.dev'), 'should reference the public signaling server')
+  it('includes y-webrtc in the bundle (opt-in via collab-signaling meta tag)', () => {
     assert.ok(deck.includes('webrtc'), 'should include webrtc provider code')
+    assert.ok(deck.includes('collab-signaling'), 'should reference the signaling meta tag name')
+  })
+
+  it('has empty signaling meta tag by default', () => {
+    const match = deck.match(/collab-signaling.*content="([^"]*)"/)
+    assert.ok(match, 'should have collab-signaling meta tag')
+    assert.equal(match[1], '', 'signaling URL should be empty by default')
   })
 
   it('sets collab-room meta tag with a UUID', () => {

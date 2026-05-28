@@ -12,7 +12,9 @@ export function initUI({ syncHandle, originalHtml }) {
 
   const status = document.createElement('span')
   status.id = 'collab-status'
-  status.textContent = 'connecting...'
+  status.textContent = syncHandle.providers.length === 0
+    ? 'offline (set collab-server or collab-signaling to sync)'
+    : 'connecting...'
   banner.appendChild(status)
 
   const { setStatus, setImportant } = createStatusController(status)
@@ -49,7 +51,7 @@ export function initUI({ syncHandle, originalHtml }) {
   if (fileLink) {
     linkBtn = document.createElement('button')
     linkBtn.textContent = 'Link to file'
-    linkBtn.title = 'Pick your local deck.html so sync writes back to disk automatically'
+    linkBtn.title = 'Save dialog: pick your existing deck.html (or a new name). Sync will then write to that file automatically.'
     linkBtn.style.cssText = btnStyle
     linkBtn.addEventListener('click', () => fileLink.pick())
     banner.appendChild(linkBtn)

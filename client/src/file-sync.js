@@ -3,7 +3,7 @@
 // file directly after the user grants one-time permission.
 
 export function isFileSystemAccessSupported() {
-  return typeof window !== 'undefined' && typeof window.showOpenFilePicker === 'function'
+  return typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function'
 }
 
 export function createFileLink({ getHtml, onLink, onWrite, onError }) {
@@ -13,11 +13,14 @@ export function createFileLink({ getHtml, onLink, onWrite, onError }) {
 
   async function pick() {
     try {
-      const [h] = await window.showOpenFilePicker({
+      // showSaveFilePicker returns a handle with write permission already
+      // granted, so we don't need a separate requestPermission step (which
+      // would fail because the user activation is consumed by the picker).
+      // The user can navigate to and select their existing deck.html.
+      const h = await window.showSaveFilePicker({
+        suggestedName: 'deck.html',
         types: [{ description: 'HTML', accept: { 'text/html': ['.html'] } }],
       })
-      const perm = await h.requestPermission({ mode: 'readwrite' })
-      if (perm !== 'granted') throw new Error('write permission denied')
       handle = h
       onLink?.(h.name)
       await writeNow()

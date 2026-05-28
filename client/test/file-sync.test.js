@@ -8,11 +8,10 @@ describe('isFileSystemAccessSupported', () => {
   })
 })
 
-function makeFakeHandle({ name = 'deck.html', grant = 'granted', writeOk = true } = {}) {
+function makeFakeHandle({ name = 'deck.html', writeOk = true } = {}) {
   const writes = []
   return {
     name,
-    requestPermission: async () => grant,
     createWritable: async () => ({
       write: async (data) => {
         if (!writeOk) throw new Error('write failed')
@@ -26,13 +25,13 @@ function makeFakeHandle({ name = 'deck.html', grant = 'granted', writeOk = true 
 
 function makeFakeWindow(handle, { abortOnPick = false } = {}) {
   return {
-    showOpenFilePicker: async () => {
+    showSaveFilePicker: async () => {
       if (abortOnPick) {
         const err = new Error('user aborted')
         err.name = 'AbortError'
         throw err
       }
-      return [handle]
+      return handle
     },
   }
 }
@@ -75,21 +74,6 @@ describe('createFileLink', () => {
     await link.pick()
     assert.equal(link.isLinked(), false)
     assert.equal(errors.length, 0)
-    global.window = orig
-  })
-
-  it('permission denied is reported via onError', async () => {
-    const orig = global.window
-    global.window = makeFakeWindow(makeFakeHandle({ grant: 'denied' }))
-    const errors = []
-    const link = createFileLink({
-      getHtml: () => '<html></html>',
-      onError: (e) => errors.push(e),
-    })
-    await link.pick()
-    assert.equal(link.isLinked(), false)
-    assert.equal(errors.length, 1)
-    assert.match(errors[0], /permission/)
     global.window = orig
   })
 

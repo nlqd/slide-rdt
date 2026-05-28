@@ -8,9 +8,15 @@ Collaborative HTML slide decks using CRDTs. Edit the raw HTML in any text editor
 wget https://raw.githubusercontent.com/nlqd/slide-rdt/main/dist/deck.html
 ```
 
-Open `deck.html` in your editor. Change the `collab-room` meta tag from the placeholder (`REPLACE-ME-PICK-ANY-UNIQUE-STRING`) to any unique string of your choosing (a UUID, your deck name, anything). Edit the slides between the `SLIDES START` / `SLIDES END` markers. Open the file in a browser. Done.
+Open `deck.html` in your editor. Three meta tags at the top:
 
-Until you change the placeholder, the deck shows a "Setup needed" banner and refuses to connect — this is intentional, so two people who both `wget` the file don't accidentally end up in the same room.
+- `collab-room` — change the placeholder to any unique string (a UUID, your deck name, anything; collaborators need the same value)
+- `collab-server` — your WebSocket relay URL, e.g. `wss://your-vps:4444`. Required for cross-session sync.
+- `collab-signaling` — your y-webrtc signaling URL, e.g. `wss://your-signaling:4444`. Required for live WebRTC peer-to-peer.
+
+Set either `collab-server` or `collab-signaling` (or both). Edit slides between the `SLIDES START` / `SLIDES END` markers. Open in a browser.
+
+Until you change the room placeholder, the deck shows a "Setup needed" banner and refuses to connect — this is intentional, so two people who both `wget` the file don't accidentally end up in the same room.
 
 ## How it works
 
@@ -33,15 +39,16 @@ The permission is per-tab. Closing and reopening the tab requires re-linking. Sa
 
 ## Sync modes
 
-By default, decks sync via WebRTC using the public signaling server at wss://signaling.yjs.dev. No server setup required. Both peers need to have the file open in a browser at the same time for WebRTC to work.
+Sync requires infrastructure you run. The deck looks for two meta tags:
 
-If you want persistence (peers can sync hours or days apart without being online simultaneously), run the relay server and pass its URL when building:
+- `<meta name="collab-server">` — points at a y-websocket relay; gives you persistence across sessions
+- `<meta name="collab-signaling">` — points at a y-webrtc signaling server; gives you browser-to-browser WebRTC
 
-```
-node build.js wss://your-server:4444
-```
+Set either or both. Without either, the deck still renders and you can edit, but nothing syncs — the status banner shows "offline" and explains.
 
-When a server URL is configured, the deck uses both WebRTC and WebSocket. WebRTC handles live sessions, the server handles persistence.
+The previously-public Yjs signaling server (`signaling.yjs.dev`) is no longer hosted, so there's no longer a zero-config peer-to-peer default. If you want WebRTC, the y-webrtc package ships its own signaling server: `npx y-webrtc-signaling` (one process, ~50 lines, deploy anywhere).
+
+The simplest setup for most users: run the `server/` directory of this repo on a VPS and set `collab-server` to its WSS URL.
 
 ## Server (optional)
 

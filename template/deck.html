@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="collab-server" content="{{SERVER_URL}}">
+  <meta name="collab-signaling" content="">
   <meta name="collab-room" content="{{ROOM_ID}}">
   <title>Collaborative Deck</title>
   <style>
@@ -62,14 +63,19 @@
 <!--
   ═══════════ GETTING STARTED ═══════════
 
-  1. Set <meta name="collab-room"> at the top to any unique string
-     (a UUID, your deck name, anything — but the same value as anyone
-     you want to collaborate with).
-  2. Optional: set <meta name="collab-server"> to your relay URL for
-     persistent sync; leave empty for peer-to-peer WebRTC only.
+  1. Set <meta name="collab-room"> to any unique string (a UUID, your
+     deck name, anything — but the same value as anyone you want to
+     collaborate with).
+  2. To sync with collaborators, set ONE of these meta tags to point
+     at running infrastructure:
+       <meta name="collab-server" content="wss://your-vps:4444">
+         WebSocket relay, persistent across sessions
+       <meta name="collab-signaling" content="wss://your-signaling:4444">
+         y-webrtc signaling server, browser-to-browser only
+     With neither set, the deck renders but does NOT sync.
   3. Edit your slides between SLIDES START/END below.
   4. Open this file in a browser. Edits sync automatically.
-  5. Click Save to download the merged version.
+  5. Click Save (or use "Link to file" in Chrome) to persist.
 -->
 <div id="collab-counter"></div>
 

@@ -65,15 +65,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const providers = []
+  const signalingUrl = document.querySelector('meta[name="collab-signaling"]')?.content
 
-  const webrtc = new WebrtcProvider(roomId, doc, {
-    signaling: ['wss://signaling.yjs.dev'],
-  })
-  providers.push(webrtc)
+  // WebRTC is opt-in: only enabled if a signaling URL is configured.
+  // The public y-webrtc signaling server is no longer hosted, so we don't
+  // try to connect by default — that would just spam connection errors.
+  if (signalingUrl) {
+    const webrtc = new WebrtcProvider(roomId, doc, {
+      signaling: [signalingUrl],
+    })
+    providers.push(webrtc)
+  }
 
   if (serverUrl) {
     const ws = new WebsocketProvider(serverUrl, roomId, doc)
     providers.push(ws)
+  }
+
+  if (providers.length === 0) {
+    console.warn('collab-slides: no sync transport configured. Set collab-server or collab-signaling in <meta> tags.')
   }
 
   const syncHandle = {
