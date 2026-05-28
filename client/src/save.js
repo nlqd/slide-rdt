@@ -1,14 +1,20 @@
-import { injectSlideContent } from './sync-client.js'
+import { MARKER_END, injectSlideContent } from './sync-client.js'
 
 const TYPE_ATTR = 'type="application/yjs-state"'
 
 function findYjsStateTag(html) {
-  const typeIdx = html.indexOf(TYPE_ATTR)
+  // Only scan the region after the slides end marker so user slide content
+  // containing the literal type attribute string can't match.
+  const searchFrom = html.indexOf(MARKER_END)
+  if (searchFrom === -1) return null
+  const typeIdx = html.indexOf(TYPE_ATTR, searchFrom)
   if (typeIdx === -1) return null
   const tagStart = html.lastIndexOf('<script', typeIdx)
-  if (tagStart === -1) return null
+  if (tagStart === -1 || tagStart < searchFrom) return null
   const tagEnd = html.indexOf('>', typeIdx + TYPE_ATTR.length)
   if (tagEnd === -1) return null
+  const openTag = html.slice(tagStart, tagEnd + 1)
+  if (!openTag.includes(TYPE_ATTR)) return null
   const closeStart = html.indexOf('</script>', tagEnd + 1)
   if (closeStart === -1) return null
   return { tagStart, tagEnd: tagEnd + 1, end: closeStart + '</script>'.length }

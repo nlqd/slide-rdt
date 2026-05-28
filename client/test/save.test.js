@@ -75,4 +75,19 @@ old
     assert.ok(result !== null)
     assert.ok(result.includes(`data-state="${tricky}"`))
   })
+
+  it('returns null when type attribute string appears only in slide content (no real tag)', () => {
+    const slideHtml = `<code>type="application/yjs-state"</code>`
+    const html = `<!-- SLIDES START -->\n${slideHtml}\n<!-- SLIDES END -->\n<script>regular</script>`
+    assert.equal(buildSaveableHtml(html, slideHtml, 'xyz'), null)
+  })
+
+  it('finds the real state tag even when type attr string appears in slide content', () => {
+    const slideHtml = `<code>type="application/yjs-state"</code>`
+    const html = `<!-- SLIDES START -->\n${slideHtml}\n<!-- SLIDES END -->\n<script type="application/yjs-state" data-state="old"></script>`
+    const result = buildSaveableHtml(html, slideHtml, 'newstate')
+    assert.ok(result !== null)
+    assert.ok(result.includes('data-state="newstate"'))
+    assert.ok(result.includes(`<code>type="application/yjs-state"</code>`), 'preserves slide content')
+  })
 })

@@ -66,7 +66,9 @@ export function initUI({ syncHandle, originalHtml }) {
   }
 
   function showRemoteChanges() {
-    setStatus('remote changes received', '#8b6914')
+    errorShownAt = 0
+    status.textContent = 'remote changes received'
+    status.style.color = '#8b6914'
   }
 
   return { showRemoteChanges }
