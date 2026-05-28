@@ -15,5 +15,12 @@ export function createStatusController(element, { now = () => Date.now(), holdMs
       element.textContent = text
       element.style.color = color
     },
+    // forceStatus bypasses the hold without extending it — for urgent
+    // state changes (e.g. disconnect) that the user needs to see even
+    // if an error message is currently being held.
+    forceStatus(text, color) {
+      element.textContent = text
+      element.style.color = color
+    },
   }
 }

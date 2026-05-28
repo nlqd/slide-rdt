@@ -17,7 +17,7 @@ export function initUI({ syncHandle, originalHtml }) {
   status.textContent = 'connecting...'
   banner.appendChild(status)
 
-  const { setStatus, setImportant } = createStatusController(status)
+  const { setStatus, setImportant, forceStatus } = createStatusController(status)
 
   const saveBtn = document.createElement('button')
   saveBtn.textContent = 'Save'
@@ -42,20 +42,38 @@ export function initUI({ syncHandle, originalHtml }) {
   })
   banner.appendChild(saveBtn)
 
+  // Track per-provider state so a transient disconnect on one transport
+  // doesn't override another that is still live. The aggregate is:
+  // "synced" if any provider is connected, "disconnected" if all are down,
+  // unchanged while still connecting.
+  const providerStates = new Map()
+  function updateAggregateStatus() {
+    const states = Array.from(providerStates.values())
+    if (states.length === 0) return
+    if (states.some(s => s === 'connected')) {
+      setStatus('synced', '#4a7c59')
+    } else if (states.every(s => s === 'disconnected')) {
+      forceStatus('disconnected', '#a0522d')
+    }
+  }
+
   // y-websocket emits status as { status: 'connected' | 'disconnected' } and
   // synced with no payload. y-webrtc emits status as { connected: boolean }
   // and synced as { synced: boolean }. Handle both shapes.
   for (const provider of syncHandle.providers) {
     if (!provider.on) continue
+    providerStates.set(provider, 'connecting')
     provider.on('status', (event) => {
       const connected = event?.status === 'connected' || event?.connected === true
       const disconnected = event?.status === 'disconnected' || event?.connected === false
-      if (connected) setStatus('synced', '#4a7c59')
-      else if (disconnected) setStatus('disconnected', '#a0522d')
+      if (connected) providerStates.set(provider, 'connected')
+      else if (disconnected) providerStates.set(provider, 'disconnected')
+      updateAggregateStatus()
     })
     provider.on('synced', (event) => {
       const isSynced = event === undefined || event === true || event?.synced === true
-      if (isSynced) setStatus('synced', '#4a7c59')
+      providerStates.set(provider, isSynced ? 'connected' : 'disconnected')
+      updateAggregateStatus()
     })
   }
 

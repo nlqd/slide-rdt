@@ -92,4 +92,23 @@ describe('createStatusController', () => {
   it('throws when element is null', () => {
     assert.throws(() => createStatusController(null), /element is required/)
   })
+
+  it('forceStatus bypasses hold without extending it', () => {
+    const el = makeElement()
+    let t = 1000
+    const ctrl = createStatusController(el, { now: () => t, holdMs: 5000 })
+
+    ctrl.setImportant('error', '#f00')
+    t = 2000
+    ctrl.forceStatus('disconnected', '#a52')
+    assert.equal(el.textContent, 'disconnected', 'forceStatus writes during hold')
+
+    t = 3000
+    ctrl.setStatus('synced', '#0f0')
+    assert.equal(el.textContent, 'disconnected', 'hold not extended; original importantUntil still in effect')
+
+    t = 6500
+    ctrl.setStatus('synced', '#0f0')
+    assert.equal(el.textContent, 'synced', 'original hold expired')
+  })
 })
